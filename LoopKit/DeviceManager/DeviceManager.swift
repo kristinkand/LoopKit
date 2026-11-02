@@ -141,11 +141,48 @@ public protocol ExclusiveDeviceControl: DeviceConfigurationSharing {
     /// Whether taking control with this export and local state means finding the device first
     /// (the host may need to keep its screen or radio awake). Default: false.
     static func takeControlNeedsSearch(adopting configuration: SharedDeviceConfiguration, localState: [String: Any]?) -> Bool
+
+    // MARK: Trio untethered watch mode
+
+    /// The next `takeControl()` has to find the device first, which may need the host awake.
+    /// Default: false.
+    var takeControlNeedsSearch: Bool { get }
+
+    /// Escalate a take whose link has not come up to the most aggressive reacquisition the kit
+    /// has. Idempotent. Returns what it did, for the caller to log; nil means nothing to escalate.
+    @discardableResult func escalateTakeControl() -> String?
+
+    /// Undo `escalateTakeControl()` once the take it served is over, reached or given up, so the
+    /// escalation never outlives it and ordinary connects resume. Idempotent. Default: does nothing.
+    func endTakeEscalation()
+
+    /// What the link has actually been doing, for the host's logs. Default: nil.
+    func connectionDiagnostics() -> String?
+
+    /// When the device last showed evidence that another controller used it. Default: nil.
+    var lastForeignSessionAt: Date? { get }
+
+    /// Refuse commands after a foreign session when this controller has released the device.
+    /// The manager clears this when it explicitly takes control back. Default: unsupported.
+    var refusesForeignSessionsSince: Date? { get set }
+
+    /// The last take failed in a way only a reset of the host's radio clears. Default: false.
+    var hostRadioNeedsReset: Bool { get }
 }
 
 public extension ExclusiveDeviceControl {
     var isControlReady: Bool { true }
     static func takeControlNeedsSearch(adopting configuration: SharedDeviceConfiguration, localState: [String: Any]?) -> Bool { false }
+    var takeControlNeedsSearch: Bool { false }
+    func escalateTakeControl() -> String? { nil }
+    func endTakeEscalation() {}
+    func connectionDiagnostics() -> String? { nil }
+    var lastForeignSessionAt: Date? { nil }
+    var refusesForeignSessionsSince: Date? {
+        get { nil }
+        set {}
+    }
+    var hostRadioNeedsReset: Bool { false }
 }
 
 public extension DeviceManagerDelegate {

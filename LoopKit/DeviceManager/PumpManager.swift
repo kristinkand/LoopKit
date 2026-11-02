@@ -374,4 +374,20 @@ public protocol PumpDeliveryOdometer {
     /// When the bolus the pump reported giving at its last read will end, whoever started it; nil
     /// when it reported none. A controller's own bolus state knows only the boluses it started.
     var bolusUnderWayEndsAt: Date? { get }
+
+    // MARK: Trio untethered watch mode
+
+    /// How fast the pump delivers a bolus, in units per second: a recorded bolus is spread over that long.
+    var bolusDeliveryRate: Double { get }
+
+    /// The temp basal durations the pump takes, shortest first.
+    var supportedTempBasalDurations: [TimeInterval] { get }
+
+    /// What the pump has yet to deliver, as last read, of a bolus this controller doesn't track: another
+    /// controller's, started after the copy this one was set up from. 0 when none runs. Default: 0.
+    var untrackedBolusRemaining: Double { get }
+}
+
+public extension PumpDeliveryOdometer {
+    var untrackedBolusRemaining: Double { 0 }
 }
