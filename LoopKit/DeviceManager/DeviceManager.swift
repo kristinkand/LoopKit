@@ -165,9 +165,6 @@ public protocol ExclusiveDeviceControl: DeviceConfigurationSharing {
     /// Refuse commands after a foreign session when this controller has released the device.
     /// The manager clears this when it explicitly takes control back. Default: unsupported.
     var refusesForeignSessionsSince: Date? { get set }
-
-    /// The last take failed in a way only a reset of the host's radio clears. Default: false.
-    var hostRadioNeedsReset: Bool { get }
 }
 
 public extension ExclusiveDeviceControl {
@@ -182,7 +179,6 @@ public extension ExclusiveDeviceControl {
         get { nil }
         set {}
     }
-    var hostRadioNeedsReset: Bool { false }
 }
 
 public extension DeviceManagerDelegate {
